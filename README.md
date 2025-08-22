@@ -5,7 +5,8 @@ Este repositorio contiene el desarrollo del proyecto FasterEmergencyRoutes, en e
 ---
 
 ## Mockup 
-[Figma](https://www.figma.com/design/Nbr4ic6qkyIvukWEjw4q6u/Figma-basics?node-id=2602-621&p=f&t=waddBTibt4OU4f6X-0)
+[Figma](https://www.figma.com/design/Nbr4ic6qkyIvukWEjw4q6u/Figma-basics?node-id=2602-621&t=waddBTibt4OU4f6X-1)
+
 
 ---
 
@@ -37,6 +38,6 @@ Este repositorio contiene el desarrollo del proyecto FasterEmergencyRoutes, en e
 ---
 
 ## Equipo Desarrollo
-- Nicolás Chandia
-- Benjamín Sobarzo
-- Sebastián Cisternas
+| [![Nicolás Chandia](https://avatars.githubusercontent.com/u/74801004?v=4)](https://github.com/zalok) | [![Benjamín Sobarzo](https://avatars.githubusercontent.com/u/111206726?v=4)](https://github.com/blosttt) | [![Sebastián Cisternas](https://avatars.githubusercontent.com/u/74798536?v=4)](https://github.com/Oricalco) |
+|---|---|---|
+| [Nicolás Chandia](https://github.com/zalok) | [Benjamín Sobarzo](https://github.com/blosttt) | [Sebastián Cisternas](https://github.com/Oricalco) |
