@@ -25,6 +25,9 @@ if __name__ == "__main__":
 # cargar datos, formatear, persistir y presentar. Se debería dividir en varias clases.
 """
 # Se divide la funcionalidad en varias clases, cada una con una única responsabilidad.
+import json
+from datetime import datetime
+
 # --- Data Source ---
 class DataSource:
     def get_data(self):
@@ -45,16 +48,28 @@ class ConsoleOutput:
     def show(self, text):
         print(text)
 
+# --- Service (orquestador) ---
+class ReportService:
+    def __init__(self, data_source, formatter, outputs):
+        self.data_source = data_source
+        self.formatter = formatter
+        self.outputs = outputs
+
+    def run_report(self):
+        data = self.data_source.get_data()
+        text = self.formatter.format(data)
+        for output in self.outputs:
+            # cada output puede decidir qué hacer con el texto
+            if hasattr(output, "save"):
+                output.save(text)
+            if hasattr(output, "show"):
+                output.show(text)
+
 # --- Main ---
 if __name__ == "__main__":
-    # cargar datos
-    data = DataSource().get_data()
-    
-    # formatear
-    text = Formatter().format(data)
-    
-    # guardar en archivo
-    FileOutput().save(text)
-    
-    # mostrar en consola
-    ConsoleOutput().show(text)
+    data_source = DataSource()
+    formatter = Formatter()
+    outputs = [FileOutput(), ConsoleOutput()]
+
+    service = ReportService(data_source, formatter, outputs)
+    service.run_report()
