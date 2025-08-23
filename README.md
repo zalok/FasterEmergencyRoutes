@@ -38,6 +38,9 @@ Este repositorio contiene el desarrollo del proyecto FasterEmergencyRoutes, en e
 ---
 
 ## Equipo Desarrollo
-| [![Nicolás Chandia](https://avatars.githubusercontent.com/u/74801004?v=4)](https://github.com/zalok) | [![Benjamín Sobarzo](https://avatars.githubusercontent.com/u/111206726?v=4)](https://github.com/blosttt) | [![Sebastián Cisternas](https://avatars.githubusercontent.com/u/74798536?v=4)](https://github.com/Oricalco) |
+
+| <a href="https://github.com/zalok"><img src="https://avatars.githubusercontent.com/u/74801004?v=4" width="300"/></a> | <a href="https://github.com/blosttt"><img src="https://avatars.githubusercontent.com/u/111206726?v=4" width="300"/></a> | <a href="https://github.com/Oricalco"><img src="https://avatars.githubusercontent.com/u/74798536?v=4" width="300"/></a> |
 |---|---|---|
 | [Nicolás Chandia](https://github.com/zalok) | [Benjamín Sobarzo](https://github.com/blosttt) | [Sebastián Cisternas](https://github.com/Oricalco) |
+
+
