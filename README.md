@@ -2,13 +2,9 @@
 
 Este repositorio contiene el desarrollo del proyecto FasterEmergencyRoutes, en el cual se implementa una solución orientada a optimizar rutas de vehiculos de emergencia utilizando integracion de APIs de rutas y optimizacion de estas mismas.
 
----
-
-## Mockup 
-[Figma](https://www.figma.com/design/Nbr4ic6qkyIvukWEjw4q6u/Figma-basics?node-id=2602-621&t=waddBTibt4OU4f6X-1)
-
-
----
+## Tareas semanales
+[Semana 1](Tareas%20semanales/Semana1)
+[Semana 2](Tareas%20semanales/Semana2)
 
 ## Tecnologías utilizadas (Sujeto a cambios)
 - React, Node.js
