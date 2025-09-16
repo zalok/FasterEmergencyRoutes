@@ -2,24 +2,24 @@ tareas_mencion
 Catedra.txt
 
 # dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+fer/node_modules
+fer/.pnp
+fer.pnp.*
+fer.yarn/*
+fer!.yarn/patches
+fer!.yarn/plugins
+fer!.yarn/releases
+fer!.yarn/versions
 
 # testing
-/coverage
+fer/coverage
 
 # next.js
-/.next/
-/out/
+fer/.next/
+fer/out/
 
 # production
-/build
+fer/build
 
 # misc
 .DS_Store
