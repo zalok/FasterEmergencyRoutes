@@ -1,26 +1,142 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  /* UCT Color Palette */
+  --uct-navy: #003087;
+  --uct-red: #D81E1E;
+  --uct-white: #FFFFFF;
+  --uct-gold: #FFC107;
+  --background: var(--uct-white);
   --foreground: #171717;
+  --primary: var(--uct-navy);
+  --accent: var(--uct-red);
+  --secondary: var(--uct-gold);
+  --text-primary: var(--uct-white);
+  --text-secondary: #4B5563; /* Neutral gray for secondary text */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --color-accent: var(--accent);
+  --color-secondary: var(--secondary);
+  --font-sans: 'Inter', Arial, Helvetica, sans-serif;
+  --font-mono: 'Fira Code', monospace;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1F2937; /* Dark gray for better contrast */
+    --foreground: #E5E7EB; /* Light gray for text */
+    --primary: #1E40AF; /* Lighter navy for dark mode */
+    --accent: #EF4444; /* Lighter red for dark mode */
+    --secondary: #FBBF24; /* Lighter gold for dark mode */
+    --text-primary: var(--uct-white);
+    --text-secondary: #D1D5DB; /* Lighter gray for secondary text */
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* Login Form Styles */
+.login-container {
+  @apply flex items-center justify-center min-h-screen;
+  background: linear-gradient(to bottom, var(--primary), var(--background));
+}
+
+.login-form {
+  @apply bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md;
+  border: 2px solid var(--accent);
+}
+
+.login-form h1 {
+  @apply text-2xl font-bold text-center mb-6;
+  color: var(--primary);
+}
+
+.login-form label {
+  @apply block text-sm font-medium mb-2;
+  color: var(--text-secondary);
+}
+
+.login-form input {
+  @apply w-full p-3 border rounded-md focus:outline-none focus:ring-2;
+  border-color: var(--primary);
+  background: var(--uct-white);
+  color: var(--foreground);
+}
+
+.login-form input:focus {
+  @apply ring-offset-2 ring-accent;
+}
+
+.login-form button {
+  @apply w-full py-3 mt-4 rounded-md font-semibold;
+  background: var(--primary);
+  color: var(--text-primary);
+  transition: background 0.3s ease;
+}
+
+.login-form button:hover {
+  @apply bg-accent;
+}
+
+.login-form .error-message {
+  @apply text-sm text-center mt-2;
+  color: var(--accent);
+}
+
+/* Emergency Routes Specific Styles */
+.alert {
+  @apply p-4 rounded-md mb-4;
+  background: var(--accent);
+  color: var(--text-primary);
+  border-left: 4px solid var(--secondary);
+}
+
+.route-button {
+  @apply px-4 py-2 rounded-md font-medium;
+  background: var(--secondary);
+  color: var(--primary);
+  transition: transform 0.2s ease;
+}
+
+.route-button:hover {
+  @apply scale-105;
+  background: var(--primary);
+  color: var(--text-primary);
+}
+
+/* Map Container (for emergency routes map) */
+.map-container {
+  @apply w-full h-96 rounded-lg shadow-md;
+  border: 1px solid var(--primary);
+}
+
+/* Accessibility */
+:focus {
+  @apply outline-none ring-2 ring-offset-2 ring-accent;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .login-form {
+    @apply p-6 max-w-sm;
+  }
+
+  .login-form h1 {
+    @apply text-xl;
+  }
+
+  .map-container {
+    @apply h-64;
+  }
 }
