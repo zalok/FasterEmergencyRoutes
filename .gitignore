@@ -1,7 +1,7 @@
 tareas_mencion
 Catedra.txt
 
-# dependencies
+# fer dependencies
 fer/node_modules
 fer/.pnp
 fer.pnp.*
@@ -10,6 +10,10 @@ fer!.yarn/patches
 fer!.yarn/plugins
 fer!.yarn/releases
 fer!.yarn/versions
+
+# backend dependencies
+backend/node_modules
+backend/.env
 
 # testing
 fer/coverage
