@@ -1,15 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import { loginUser } from "@/lib/api";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí luego conecta con su backend
-    console.log({ email, password });
+    try {
+      const data = await loginUser(email, password);
+      console.log("Login exitoso:", data);
+      // Guardar token en localStorage o cookies
+      localStorage.setItem('token', data.token);
+    } catch (err) {
+      alert(err);
+      console.error("Error en login:", err);
+    }
   };
 
   return (

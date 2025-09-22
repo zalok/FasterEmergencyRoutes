@@ -5,11 +5,18 @@ const { MongoClient, ObjectId } = require('mongodb');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+const { StrongPassword } = require('./patterns/passwordStrategy');
+const { ConsoleEmail } = require('./patterns/notificationAdapter');
+const { Subject, LoginLogger } = require('./patterns/observer');
+
 dotenv.config();
 
 const mongoUri = process.env.MONGO_DB;
 const client = new MongoClient(mongoUri);
 const JWT_SECRET = process.env.JWT_SECRET || 'emergency_secret_key_change_in_production';
+
+const loginSubject = new Subject();
+loginSubject.subscribe(new LoginLogger());
 
 // Conectar a MongoDB
 let db;
@@ -129,36 +136,38 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 // POST - Login de usuario
+
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    
-    if (!email || !password) {
+
+    if (!email || !password)
       return res.status(400).json({ error: 'Email y contraseña son requeridos' });
-    }
 
-    // Buscar usuario
     const user = await db.collection('users').findOne({ email });
-    if (!user) {
-      return res.status(400).json({ error: 'Credenciales inválidas' });
+    if (!user) return res.status(400).json({ error: 'Credenciales inválidas' });
+
+    // Strategy: validación de contraseña
+    const passwordValidator = new StrongPassword();
+    if (!passwordValidator.validate(password)) {
+      return res.status(400).json({ error: 'Contraseña no cumple requisitos de seguridad' });
     }
 
-    // Verificar contraseña
     const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-      return res.status(400).json({ error: 'Credenciales inválidas' });
-    }
+    if (!validPassword) return res.status(400).json({ error: 'Credenciales inválidas' });
 
-    // Generar token JWT
     const token = jwt.sign(
-      { 
-        userId: user._id, 
-        email: user.email,
-        emergencyType: user.emergencyType
-      }, 
-      JWT_SECRET, 
+      { userId: user._id, email: user.email, emergencyType: user.emergencyType },
+      JWT_SECRET,
       { expiresIn: '24h' }
     );
+
+    // Observer: log de auditoría
+    loginSubject.notify({ user: email, time: new Date() });
+
+    // Adapter: enviar notificación
+    const notifier = new ConsoleEmail();
+    notifier.send(`Usuario ${email} ha iniciado sesión`);
 
     res.json({
       message: 'Login exitoso',
@@ -175,6 +184,7 @@ app.post('/api/auth/login', async (req, res) => {
         currentLocation: user.currentLocation
       }
     });
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
