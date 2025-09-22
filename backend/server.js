@@ -777,7 +777,7 @@ app.get('/api/stats/vehicle', authenticateToken, async (req, res) => {
 // ========== END ENDPOINTS ==========
 
 // Manejo de errores 404
-app.use('*', (req, res) => {
+app.use((req, res) => {
   res.status(404).json({ error: 'Endpoint no encontrado' });
 });
 
