@@ -1,23 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { loginUser } from "@/lib/api";
+import { useAuth } from "@/lib/context/AuthContext";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const data = await loginUser(email, password);
+      const data = await login(email, password);
       console.log("Login exitoso:", data);
-      // Guardar token en localStorage o cookies
-      localStorage.setItem('token', data.token);
-      // Redireccionar al login
       window.location.href = "http://localhost:3000/login/success";
-    } catch (err) {
-      alert(err);
+    } catch (err: any) {
+      alert(err?.message || String(err));
       console.error("Error en login:", err);
     }
   };
