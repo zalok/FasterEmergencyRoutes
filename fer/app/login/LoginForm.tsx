@@ -14,6 +14,8 @@ export default function LoginForm() {
       console.log("Login exitoso:", data);
       // Guardar token en localStorage o cookies
       localStorage.setItem('token', data.token);
+      // Redireccionar al login
+      window.location.href = "http://localhost:3000/login/success";
     } catch (err) {
       alert(err);
       console.error("Error en login:", err);
