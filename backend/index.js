@@ -43,7 +43,7 @@ async function startServer() {
     app.use('/api', apiRouter);
 
     app.listen(PORT, () => {
-      console.log(`🚑 Emergency Tracker Server (Hexagonal) running on http://localhost:${PORT}`);
+      console.log(`🚑 Emergency Tracker Server running on http://localhost:${PORT}`);
     });
 
   } catch (err) {
