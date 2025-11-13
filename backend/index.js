@@ -16,9 +16,9 @@ const { createAuthMiddleware } = require('./adapters/primary/authMiddleware');
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT;
 const mongoUri = process.env.MONGO_DB;
-const jwtSecret = process.env.JWT_SECRET || 'emergency_secret_key';
+const jwtSecret = process.env.JWT_SECRET;
 
 app.use(helmet());
 

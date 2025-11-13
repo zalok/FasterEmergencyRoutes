@@ -1,7 +1,6 @@
 const User = require('../domain/user');
 
 class UserService {
-  // ... (tu constructor no cambia)
   constructor(userRepository, passwordService, authService) {
     this.userRepository = userRepository;
     this.passwordService = passwordService;
@@ -22,7 +21,7 @@ class UserService {
 
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
-      throw new Error("Email No disponible");
+      throw new Error("No se pudo procesar el registro. Por favor, verifique sus datos.");
     }
 
     const hashedPassword = await this.passwordService.hash(password);
@@ -37,15 +36,16 @@ class UserService {
 
   async loginUser(email, password) {
     const user = await this.userRepository.findByEmail(email);
+    const genericError = new Error("Credenciales inválidas");
+
     if (!user) {
-      console.error(`Intento de login fallido`);
-      throw new Error("Credenciales inválidas");
+      await this.passwordService.compare(password, "$2b$10$randomhashrandomhashrandomha"); 
+      throw genericError;
     }
 
     const isValid = await this.passwordService.compare(password, user.passwordHash);
     if (!isValid) {
-      console.error(`Intento de login fallido`);
-      throw new Error("Credenciales inválidas");
+      throw genericError;
     }
 
     const token = this.authService.generateToken({
