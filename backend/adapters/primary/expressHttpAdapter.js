@@ -1,9 +1,18 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 
-function createApiRouter(userService, incidentService) {
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Demasiados intentos desde esta IP. Por favor, intente después.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+function createApiRouter(userService, authMiddleware, incidentService) {
   const router = express.Router();
-
-  router.post('/auth/register', async (req, res) => {
+  
+  router.post('/auth/register', authLimiter, async (req, res) => {
     try {
       const { name, email, password, emergencyType, vehicleNumber } = req.body;
       
@@ -16,7 +25,7 @@ function createApiRouter(userService, incidentService) {
     }
   });
 
-  router.post('/auth/login', async (req, res) => {
+  router.post('/auth/login', authLimiter, async (req, res) => {
     try {
       const { email, password } = req.body;
       
@@ -31,6 +40,17 @@ function createApiRouter(userService, incidentService) {
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
+  });
+
+  router.get('/validate-token', authMiddleware, (req, res) => {
+    res.status(200).json({
+      status: 'success',
+      data: {
+        sub: req.user.userId,
+        email: req.user.email,
+        emergencyType: req.user.emergencyType
+      }
+    });
   });
 
   return router;

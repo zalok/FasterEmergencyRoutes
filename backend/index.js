@@ -1,13 +1,16 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const helmet = require('helmet');
 const { MongoClient } = require('mongodb');
+
 
 const UserService = require('./core/services/userService');
 const { createApiRouter } = require('./adapters/primary/expressHttpAdapter');
 const MongoUserRepository = require('./adapters/secondary/mongoUserRepository');
 const BcryptPasswordService = require('./adapters/secondary/bcryptPasswordService');
 const JwtAuthService = require('./adapters/secondary/jwtAuthService');
+const { createAuthMiddleware } = require('./adapters/primary/authMiddleware');
 // const MongoIncidentRepository = require('./adapters/secondary/mongoIncidentRepository');
 
 dotenv.config();
@@ -17,8 +20,16 @@ const PORT = process.env.PORT || 8000;
 const mongoUri = process.env.MONGO_DB;
 const jwtSecret = process.env.JWT_SECRET || 'emergency_secret_key';
 
+app.use(helmet());
+
+const corsOptions = {
+  origin: 'http://localhost:3000', 
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+
 // Middlewares
-app.use(cors());
 app.use(express.json());
 
 async function startServer() {
@@ -38,12 +49,14 @@ async function startServer() {
       authService
     );
 
-    const apiRouter = createApiRouter(userService /*, incidentService */);
+    const authMiddleware = createAuthMiddleware(authService);
+
+    const apiRouter = createApiRouter(userService, authMiddleware);
 
     app.use('/api', apiRouter);
 
     app.listen(PORT, () => {
-      console.log(`🚑 Emergency Tracker Server running on http://localhost:${PORT}`);
+      console.log(`Server running on http://localhost:${PORT} 🚀`);
     });
 
   } catch (err) {

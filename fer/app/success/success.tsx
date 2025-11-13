@@ -16,7 +16,7 @@ export default function LoginSuccess() {
       return;
     }
 
-    fetch("/api/validate-token", {
+    fetch("http://localhost:8000/api/validate-token", {
       headers: {
         Authorization: "Bearer " + token,
       },

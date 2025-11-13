@@ -1,7 +1,7 @@
 const User = require('../domain/user');
 
 class UserService {
-  // Inyectamos las dependencias (los puertos)
+  // ... (tu constructor no cambia)
   constructor(userRepository, passwordService, authService) {
     this.userRepository = userRepository;
     this.passwordService = passwordService;
@@ -9,9 +9,20 @@ class UserService {
   }
 
   async registerUser(name, email, password, emergencyType, vehicleNumber) {
+    if (!password) {
+      throw new Error("La contraseña es obligatoria.");
+    }
+    const passwordPolicyRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    
+    if (!passwordPolicyRegex.test(password)) {
+      throw new Error(
+        "La contraseña no cumple con los requisitos: debe tener al menos 8 caracteres, una mayúscula y un número."
+      );
+    }
+
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
-      throw new Error("El usuario ya existe");
+      throw new Error("Email No disponible");
     }
 
     const hashedPassword = await this.passwordService.hash(password);
@@ -27,13 +38,13 @@ class UserService {
   async loginUser(email, password) {
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
-      console.error(`Intento de login fallido: Email ${email} no encontrado.`);
+      console.error(`Intento de login fallido`);
       throw new Error("Credenciales inválidas");
     }
 
     const isValid = await this.passwordService.compare(password, user.passwordHash);
     if (!isValid) {
-      console.error(`Intento de login fallido: Contraseña incorrecta para ${email}.`);
+      console.error(`Intento de login fallido`);
       throw new Error("Credenciales inválidas");
     }
 
