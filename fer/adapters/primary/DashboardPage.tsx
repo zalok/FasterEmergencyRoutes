@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/lib/context/AuthContext";
+import { useAuth } from "@/core/context/AuthContext";
 import { useRouter } from "next/navigation";
 
 // Tipo para el incidente simulado

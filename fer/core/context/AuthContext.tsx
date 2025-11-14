@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useMemo, useState, ReactNode } from 'react';
-import { AuthApiFetch, TokenSessionStorage, AuthService } from '@/lib/api';
+import { AuthApiFetch, TokenSessionStorage, AuthService } from '../api';
 
 type AuthContextValue = {
   login: (email: string, password: string) => Promise<any>;

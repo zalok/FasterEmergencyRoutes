@@ -1,4 +1,4 @@
-import { IAuthApi } from "@/lib/ports/IAuthApi";
+import { IAuthApi } from "@ports/IAuthApi";
 
 export class AuthApiFetch implements IAuthApi {
   private baseUrl: string;

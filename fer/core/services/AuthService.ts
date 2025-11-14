@@ -1,5 +1,5 @@
-import { IAuthApi } from "@/lib/ports/IAuthApi";
-import { ITokenStorage } from "@/lib/ports/ITokenStorage";
+import { IAuthApi } from "../../ports/IAuthApi";
+import { ITokenStorage } from "../../ports/ITokenStorage";
 
 export class AuthService {
   private api: IAuthApi;

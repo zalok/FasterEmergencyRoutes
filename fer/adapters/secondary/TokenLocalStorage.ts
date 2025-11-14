@@ -1,4 +1,4 @@
-import { ITokenStorage } from "@/lib/ports/ITokenStorage";
+import { ITokenStorage } from "@ports/ITokenStorage";
 
 export class TokenLocalStorage implements ITokenStorage {
   private key: string;
