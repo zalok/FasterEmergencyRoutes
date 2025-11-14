@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/core/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function LoginSuccess() {
   const [message, setMessage] = useState("Validando token...");
   const [username, setUsername] = useState<string | null>(null);
   const { token, logout } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     if (!token) {
@@ -29,6 +31,8 @@ export default function LoginSuccess() {
         if (data.status === "success") {
           setUsername(data.data.sub || "Usuario");
           setMessage("✅ Inicio de sesión exitoso!");
+          // Redirigir al dashboard después de un corto tiempo
+          setTimeout(() => router.push("/dashboard"), 1200);
         } else {
           setMessage("Error");
           // Forzar logout y redirección
@@ -39,7 +43,7 @@ export default function LoginSuccess() {
       .catch(() => {
         setMessage("Error");
       });
-  }, [token, logout]);
+  }, [token, logout, router]);
 
   return (
     <div style={{ textAlign: "center", marginTop: "100px", fontFamily: "Arial" }}>
