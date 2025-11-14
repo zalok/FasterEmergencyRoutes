@@ -34,9 +34,10 @@ const handleError = (res, error) => {
   return res.status(500).json({ error: 'Ocurrió un error interno en el servidor.' });
 };
 
-function createApiRouter(userService, authMiddleware) {
+function createApiRouter(userService, incidentService, authMiddleware) {
   const router = express.Router();
   
+  // Auth Routes
   router.post('/auth/register', authLimiter, async (req, res) => {
     try {
       const name = req.body.name?.trim();
@@ -75,7 +76,13 @@ function createApiRouter(userService, authMiddleware) {
       res.status(200).json({
         message: 'Login exitoso',
         token,
-        user: { id: user.id, name: user.name, email: user.email }
+        user: { 
+          id: user.id, 
+          name: user.name, 
+          email: user.email,
+          emergencyType: user.emergencyType,
+          vehicleNumber: user.vehicleNumber
+        }
       });
 
     } catch (error) {
@@ -92,6 +99,117 @@ function createApiRouter(userService, authMiddleware) {
         emergencyType: req.user.emergencyType
       }
     });
+  });
+
+  // Dashboard Routes
+  router.get('/dashboard/stats', authMiddleware, async (req, res) => {
+    try {
+      // Usar el servicio de incidentes para obtener estadísticas reales
+      const stats = await incidentService.getDashboardStats();
+      
+      res.status(200).json(stats);
+    } catch (error) {
+      handleError(res, error);
+    }
+  });
+
+  router.get('/incidents/recent', authMiddleware, async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit) || 10;
+      const incidents = await incidentService.getRecentIncidents(limit);
+      
+      res.status(200).json({ incidents });
+    } catch (error) {
+      handleError(res, error);
+    }
+  });
+
+  router.get('/incidents/active', authMiddleware, async (req, res) => {
+    try {
+      const incidents = await incidentService.getActiveIncidents();
+      
+      res.status(200).json({ incidents });
+    } catch (error) {
+      handleError(res, error);
+    }
+  });
+
+  router.post('/incidents', authMiddleware, async (req, res) => {
+    try {
+      const { type, location, status, severity, description, assignedUnit } = req.body;
+      
+      if (!type || !location || !status) {
+        return res.status(400).json({ error: "Tipo, ubicación y estado son obligatorios." });
+      }
+
+      const incidentData = {
+        type,
+        location,
+        status,
+        severity: severity || 'media',
+        description,
+        assignedUnit,
+        reportedBy: req.user.userId // Usuario que reporta el incidente
+      };
+
+      const newIncident = await incidentService.createIncident(incidentData);
+      
+      res.status(201).json(newIncident);
+    } catch (error) {
+      handleError(res, error);
+    }
+  });
+
+  router.get('/incidents/:id', authMiddleware, async (req, res) => {
+    try {
+      const incident = await incidentService.getIncidentById(req.params.id);
+      
+      if (!incident) {
+        return res.status(404).json({ error: "Incidente no encontrado" });
+      }
+      
+      res.status(200).json(incident);
+    } catch (error) {
+      handleError(res, error);
+    }
+  });
+
+  router.put('/incidents/:id', authMiddleware, async (req, res) => {
+    try {
+      const { status, assignedUnit, severity } = req.body;
+      
+      const updatedIncident = await incidentService.updateIncident(
+        req.params.id, 
+        { status, assignedUnit, severity }
+      );
+      
+      if (!updatedIncident) {
+        return res.status(404).json({ error: "Incidente no encontrado" });
+      }
+      
+      res.status(200).json(updatedIncident);
+    } catch (error) {
+      handleError(res, error);
+    }
+  });
+
+  // Rutas adicionales para el dashboard
+  router.get('/dashboard/overview', authMiddleware, async (req, res) => {
+    try {
+      const [stats, recentIncidents, activeIncidents] = await Promise.all([
+        incidentService.getDashboardStats(),
+        incidentService.getRecentIncidents(5),
+        incidentService.getActiveIncidents()
+      ]);
+      
+      res.status(200).json({
+        stats,
+        recentIncidents,
+        activeIncidents
+      });
+    } catch (error) {
+      handleError(res, error);
+    }
   });
 
   return router;

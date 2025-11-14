@@ -1,12 +1,27 @@
 class Incident {
-    constructor(id, type, location, severity, description, reportedAt) {
-      this.id = id;
-      this.type = type;
-      this.location = location;
-      this.severity = severity;
-      this.description = description;
-      this.reportedAt = reportedAt;
-    }
+  constructor(
+    id, 
+    type, 
+    location, 
+    status, 
+    severity = 'media', 
+    description = '', 
+    assignedUnit = '', 
+    reportedBy = '',
+    createdAt = new Date(), 
+    updatedAt = new Date()
+  ) {
+    this.id = id;
+    this.type = type;
+    this.location = location;
+    this.status = status;
+    this.severity = severity;
+    this.description = description;
+    this.assignedUnit = assignedUnit;
+    this.reportedBy = reportedBy;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+  }
 }
 
 module.exports = Incident;

@@ -4,14 +4,14 @@ const dotenv = require('dotenv');
 const helmet = require('helmet');
 const { MongoClient } = require('mongodb');
 
-
 const UserService = require('./core/services/userService');
+const IncidentService = require('./core/services/incidentService'); // Nuevo
 const { createApiRouter } = require('./adapters/primary/expressHttpAdapter');
 const MongoUserRepository = require('./adapters/secondary/mongoUserRepository');
+const MongoIncidentRepository = require('./adapters/secondary/mongoIncidentRepository'); // Nuevo
 const BcryptPasswordService = require('./adapters/secondary/bcryptPasswordService');
 const JwtAuthService = require('./adapters/secondary/jwtAuthService');
 const { createAuthMiddleware } = require('./adapters/primary/authMiddleware');
-// const MongoIncidentRepository = require('./adapters/secondary/mongoIncidentRepository');
 
 dotenv.config();
 
@@ -39,7 +39,11 @@ async function startServer() {
     const db = client.db('emergency_tracker');
     console.log('Connected to MongoDB 🎉');
 
+    // Inicializar repositorios
     const userRepository = new MongoUserRepository(db);
+    const incidentRepository = new MongoIncidentRepository(db); // Nuevo
+    
+    // Inicializar servicios
     const passwordService = new BcryptPasswordService();
     const authService = new JwtAuthService(jwtSecret);
 
@@ -49,9 +53,12 @@ async function startServer() {
       authService
     );
 
+    const incidentService = new IncidentService(incidentRepository); // Nuevo
+
     const authMiddleware = createAuthMiddleware(authService);
 
-    const apiRouter = createApiRouter(userService, authMiddleware);
+    // Pasar ambos servicios al router
+    const apiRouter = createApiRouter(userService, incidentService, authMiddleware);
 
     app.use('/api', apiRouter);
 

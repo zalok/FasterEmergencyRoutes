@@ -4,40 +4,128 @@ import React, { createContext, useContext, useMemo, useState, ReactNode } from '
 import { useRouter } from 'next/navigation';
 import { AuthApiFetch, TokenSessionStorage, AuthService } from '../api';
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  emergencyType?: string;
+  vehicleNumber?: string;
+}
+
 type AuthContextValue = {
   login: (email: string, password: string) => Promise<any>;
   register: (name: string, email: string, password: string, emergencyType?: string, vehicleNumber?: string) => Promise<any>;
   logout: () => void;
   token: string | null;
+  user: User | null;
+  incidentApi: any;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+// Función para guardar usuario en sessionStorage
+const saveUserToStorage = (user: User | null) => {
+  if (typeof window !== 'undefined') {
+    if (user) {
+      sessionStorage.setItem('auth_user', JSON.stringify(user));
+    } else {
+      sessionStorage.removeItem('auth_user');
+    }
+  }
+};
+
+// Función para obtener usuario de sessionStorage
+const getUserFromStorage = (): User | null => {
+  if (typeof window !== 'undefined') {
+    const userData = sessionStorage.getItem('auth_user');
+    if (userData) {
+      try {
+        return JSON.parse(userData);
+      } catch (error) {
+        console.error('Error parsing user data from storage:', error);
+        return null;
+      }
+    }
+  }
+  return null;
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const authService = useMemo(() => new AuthService(new AuthApiFetch(), new TokenSessionStorage()), []);
+  
+  // Mock de incidentApi para evitar errores de importación
+  const incidentApi = useMemo(() => ({
+    getDashboardStats: async (): Promise<any> => {
+      return {
+        totalIncidents: 0,
+        activeIncidents: 0,
+        resolvedToday: 0,
+        averageResponseTime: "0 min"
+      };
+    },
+    getRecentIncidents: async (): Promise<any[]> => {
+      return [];
+    },
+    getActiveIncidents: async (): Promise<any[]> => {
+      return [];
+    },
+    createIncident: async (): Promise<any> => {
+      return {};
+    }
+  }), []);
+
   const [token, setToken] = useState<string | null>(() => authService.getToken());
+  const [user, setUser] = useState<User | null>(() => getUserFromStorage());
 
   const login = async (email: string, password: string) => {
     const result = await authService.login(email, password);
     setToken(authService.getToken());
+    
+    // Extraer información del usuario del token o de la respuesta
+    if (result.user) {
+      const userData = {
+        id: result.user.id,
+        name: result.user.name,
+        email: result.user.email,
+        emergencyType: result.user.emergencyType,
+        vehicleNumber: result.user.vehicleNumber
+      };
+      setUser(userData);
+      saveUserToStorage(userData);
+    }
+    
     return result;
   };
 
   const register = async (name: string, email: string, password: string, emergencyType?: string, vehicleNumber?: string) => {
     const result = await authService.register(name, email, password, emergencyType, vehicleNumber);
+    
+    // Establecer información del usuario después del registro
+    const userData = {
+      id: result.userId,
+      name,
+      email,
+      emergencyType,
+      vehicleNumber
+    };
+    
+    setUser(userData);
+    saveUserToStorage(userData);
+    
     return result;
   };
 
   const logout = () => {
     authService.logout();
     setToken(null);
-    // Redirigir al login después de cerrar sesión
+    setUser(null);
+    saveUserToStorage(null);
     router.push('/login');
   };
 
   return (
-    <AuthContext.Provider value={{ login, register, logout, token }}>
+    <AuthContext.Provider value={{ login, register, logout, token, user, incidentApi }}>
       {children}
     </AuthContext.Provider>
   );
