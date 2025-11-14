@@ -10,6 +10,11 @@ export class AuthService {
     this.storage = storage;
   }
 
+  async register(name: string, email: string, password: string, emergencyType?: string, vehicleNumber?: string) {
+    const result = await this.api.register(name, email, password, emergencyType, vehicleNumber);
+    return result;
+  }
+
   async login(email: string, password: string) {
     const result = await this.api.login(email, password);
     if (result && result.token) {
@@ -22,6 +27,7 @@ export class AuthService {
     try {
       await this.api.logout();
     } catch (e) {
+      // Silently fail if logout endpoint fails
     }
     this.storage.clearToken();
   }

@@ -7,6 +7,21 @@ export class AuthApiFetch implements IAuthApi {
     this.baseUrl = baseUrl.replace(/\/+$/, "");
   }
 
+  async register(name: string, email: string, password: string, emergencyType?: string, vehicleNumber?: string) {
+    const res = await fetch(`${this.baseUrl}/api/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password, emergencyType, vehicleNumber })
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({ error: 'Error' }));
+      throw new Error(errorData.error || errorData.message || 'Error en el registro');
+    }
+
+    return await res.json();
+  }
+
   async login(email: string, password: string) {
     const res = await fetch(`${this.baseUrl}/api/auth/login`, {
       method: "POST",
@@ -23,13 +38,12 @@ export class AuthApiFetch implements IAuthApi {
   }
 
   async getSession() {
-    const res = await fetch(`${this.baseUrl}/api/auth/session`, {
+    const res = await fetch(`${this.baseUrl}/api/auth/validate-token`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     });
 
     if (!res.ok) {
-      // No hay sesión activa
       throw new Error('No hay sesión activa');
     }
 

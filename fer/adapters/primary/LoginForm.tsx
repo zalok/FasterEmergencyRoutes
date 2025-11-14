@@ -2,21 +2,31 @@
 
 import { useState } from "react";
 import { useAuth } from "@/core/context/AuthContext";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
+
+    setIsLoading(true);
     try {
       const data = await login(email, password);
       console.log("Login exitoso:", data);
-      window.location.href = "http://localhost:3000/login/success";
+      // Redirigir al dashboard
+      router.push('/dashboard');
     } catch (err: any) {
       alert(err?.message || String(err));
       console.error("Error en login:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -45,6 +55,7 @@ export default function LoginForm() {
             focus:outline-none focus:ring-2 focus:ring-blue-200 
             transition-colors"
             required
+            disabled={isLoading}
             />
         </div>
 
@@ -68,23 +79,37 @@ export default function LoginForm() {
             focus:outline-none focus:ring-2 focus:ring-blue-200 
             transition-colors"
             required
+            disabled={isLoading}
           />
         </div>
 
         {/* Botón */}
         <button
           type="submit"
-          className="w-full rounded-lg bg-blue-600 p-3 text-white transition hover:bg-blue-700 active:scale-95"
+          disabled={isLoading}
+          className={`w-full rounded-lg p-3 text-white transition active:scale-95 ${
+            isLoading 
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-blue-600 hover:bg-blue-700'
+          }`}
         >
-          Entrar
+          {isLoading ? 'Iniciando sesión...' : 'Entrar'}
         </button>
       </form>
 
-      {/* Enlace extra */}
-      <div className="mt-4 text-center text-sm text-gray-500">
-        <a href="#" className="hover:text-blue-600">
-          ¿Olvidaste tu contraseña?
-        </a>
+      {/* Enlaces */}
+      <div className="mt-4 space-y-2 text-center text-sm text-gray-500">
+        <div>
+          <a href="#" className="hover:text-blue-600">
+            ¿Olvidaste tu contraseña?
+          </a>
+        </div>
+        <div>
+          ¿No tienes cuenta?{" "}
+          <Link href="/register" className="text-green-600 hover:text-green-700">
+            Regístrate aquí
+          </Link>
+        </div>
       </div>
     </div>
   );
