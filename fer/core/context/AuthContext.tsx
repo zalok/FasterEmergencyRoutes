@@ -19,6 +19,7 @@ type AuthContextValue = {
   token: string | null;
   user: User | null;
   incidentApi: any;
+  loading: boolean; // ← PROPIEDAD AÑADIDA
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -77,55 +78,85 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const [token, setToken] = useState<string | null>(() => authService.getToken());
   const [user, setUser] = useState<User | null>(() => getUserFromStorage());
+  const [loading, setLoading] = useState<boolean>(false); // ← ESTADO AÑADIDO
 
   const login = async (email: string, password: string) => {
-    const result = await authService.login(email, password);
-    setToken(authService.getToken());
-    
-    // Extraer información del usuario del token o de la respuesta
-    if (result.user) {
-      const userData = {
-        id: result.user.id,
-        name: result.user.name,
-        email: result.user.email,
-        emergencyType: result.user.emergencyType,
-        vehicleNumber: result.user.vehicleNumber
-      };
-      setUser(userData);
-      saveUserToStorage(userData);
+    setLoading(true); // ← INICIAR LOADING
+    try {
+      const result = await authService.login(email, password);
+      setToken(authService.getToken());
+      
+      // Extraer información del usuario del token o de la respuesta
+      if (result.user) {
+        const userData = {
+          id: result.user.id,
+          name: result.user.name,
+          email: result.user.email,
+          emergencyType: result.user.emergencyType,
+          vehicleNumber: result.user.vehicleNumber
+        };
+        setUser(userData);
+        saveUserToStorage(userData);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    } finally {
+      setLoading(false); // ← FINALIZAR LOADING
     }
-    
-    return result;
   };
 
   const register = async (name: string, email: string, password: string, emergencyType?: string, vehicleNumber?: string) => {
-    const result = await authService.register(name, email, password, emergencyType, vehicleNumber);
-    
-    // Establecer información del usuario después del registro
-    const userData = {
-      id: result.userId,
-      name,
-      email,
-      emergencyType,
-      vehicleNumber
-    };
-    
-    setUser(userData);
-    saveUserToStorage(userData);
-    
-    return result;
+    setLoading(true); // ← INICIAR LOADING
+    try {
+      const result = await authService.register(name, email, password, emergencyType, vehicleNumber);
+      
+      // Establecer información del usuario después del registro
+      const userData = {
+        id: result.userId,
+        name,
+        email,
+        emergencyType,
+        vehicleNumber
+      };
+      
+      setUser(userData);
+      saveUserToStorage(userData);
+      
+      return result;
+    } catch (error) {
+      console.error('Register error:', error);
+      throw error;
+    } finally {
+      setLoading(false); // ← FINALIZAR LOADING
+    }
   };
 
   const logout = () => {
-    authService.logout();
-    setToken(null);
-    setUser(null);
-    saveUserToStorage(null);
-    router.push('/login');
+    setLoading(true); // ← INICIAR LOADING
+    try {
+      authService.logout();
+      setToken(null);
+      setUser(null);
+      saveUserToStorage(null);
+      router.push('/login');
+    } finally {
+      setLoading(false); // ← FINALIZAR LOADING
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ login, register, logout, token, user, incidentApi }}>
+    <AuthContext.Provider value={{ 
+      login, 
+      register, 
+      logout, 
+      token, 
+      user, 
+      incidentApi, 
+      loading // ← PROPIEDAD INCLUIDA EN EL VALUE
+    }}>
       {children}
     </AuthContext.Provider>
   );
